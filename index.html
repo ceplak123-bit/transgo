@@ -1,110 +1,505 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TransGo</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #f1f5f9;
-    }
-    .login-wrap {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: linear-gradient(135deg, #1e3a8a, #2563eb, #0ea5e9);
-    }
-    .login-card {
-      background: #fff;
-      width: 100%;
-      max-width: 400px;
-      border-radius: 20px;
-      padding: 34px 26px;
-      box-shadow: 0 20px 50px rgba(0,0,0,.25);
-    }
-    .logo { font-size: 44px; text-align: center; line-height: 1; }
-    h1 { text-align: center; font-size: 24px; margin: 8px 0 4px; }
-    .sub { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 22px; }
-    .role-tabs {
-      display: flex;
-      background: #f1f5f9;
-      border-radius: 12px;
-      padding: 5px;
-      gap: 4px;
-      margin-bottom: 20px;
-    }
-    .role-tab {
-      flex: 1;
-      border: none;
-      background: transparent;
-      padding: 10px 6px;
-      border-radius: 9px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #64748b;
-      cursor: pointer;
-    }
-    .role-tab.active { background: #fff; color: #2563eb; }
-    .field { display: block; margin-bottom: 14px; }
-    .field span {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #334155;
-    }
-    .input {
-      width: 100%;
-      padding: 12px 13px;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 14px;
-      outline: none;
-    }
-    .input:focus { border-color: #2563eb; }
-    .btn {
-      border: none;
-      border-radius: 10px;
-      padding: 13px 16px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      width: 100%;
-      margin-top: 6px;
-    }
-    .btn-primary { background: #2563eb; color: #fff; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TransGo</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;color:#0f172a;min-height:100vh}
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#1e3a8a,#2563eb,#0ea5e9)}
+  .login-card{background:#fff;width:100%;max-width:400px;border-radius:20px;padding:34px 30px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+  .logo{font-size:44px;text-align:center}
+  .login-card h1{text-align:center;font-size:26px;margin:8px 0 4px}
+  .sub{text-align:center;color:#64748b;font-size:13px;margin-bottom:22px}
+  .role-tabs{display:flex;background:#f1f5f9;border-radius:12px;padding:5px;gap:4px;margin-bottom:20px}
+  .role-tab{flex:1;border:none;background:transparent;padding:10px 6px;border-radius:9px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit}
+  .role-tab.active{background:#fff;color:#2563eb;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+  .field{display:block;margin-bottom:14px}
+  .field span{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#334155}
+  .input{width:100%;padding:11px 13px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;font-family:inherit}
+  .input:focus{border-color:#2563eb;box-shadow:0 0 0 3px #dbeafe}
+  .btn{border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .btn-primary{background:#2563eb;color:#fff}
+  .btn-primary:hover{background:#1d4ed8}
+  .btn-block{width:100%;padding:13px;font-size:15px;margin-top:6px}
+  .btn-ghost{background:transparent;color:#64748b;border:1.5px solid #e2e8f0;padding:7px 12px;font-size:12.5px}
+  .error{color:#dc2626;font-size:13px;min-height:18px;margin-bottom:6px}
+  .info{margin-top:18px;padding:12px 14px;background:#f8fafc;border:1px dashed #e2e8f0;border-radius:10px;font-size:12px;color:#64748b;line-height:1.7}
+  .info b{color:#334155}
+  .topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+  .brand{font-size:17px;display:flex;align-items:center;gap:8px;font-weight:700}
+  .userbox{display:flex;align-items:center;gap:14px}
+  .uinfo{text-align:right;line-height:1.3}
+  .uinfo span{font-weight:600;font-size:14px;display:block}
+  .uinfo small{color:#64748b;font-size:11.5px;text-transform:uppercase}
+  main{max-width:900px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,.05);margin-bottom:16px}
+  .card h3{font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .card h3::before{content:"";width:4px;height:18px;background:#2563eb;border-radius:3px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+  .services{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+  @media(max-width:640px){.services{grid-template-columns:1fr}}
+  .service-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;font-size:13.5px}
+  .service-item:hover{border-color:#bfdbfe;background:#f8fafc}
+  .service-item input{accent-color:#2563eb;width:16px;height:16px}
+  .service-item span{flex:1}
+  .service-item b{font-size:12.5px;color:#2563eb}
+  .total-box{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:12px;padding:15px 18px;margin:16px 0;border:1px solid #bfdbfe}
+  .total-box span{font-size:13.5px;color:#1e40af;font-weight:600}
+  .total-box strong{font-size:22px;color:#1e3a8a}
+  .order{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px}
+  .order-top{display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:8px}
+  .route{font-weight:700;font-size:14.5px}
+  .order-meta{font-size:12.5px;color:#64748b;line-height:1.85}
+  .order-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:11px;border-top:1px dashed #e2e8f0;gap:10px;flex-wrap:wrap}
+  .price{font-weight:700;font-size:15px;color:#1e3a8a}
+  .badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+  .badge-amber{background:#fef3c7;color:#92400e}
+  .badge-blue{background:#dbeafe;color:#1e40af}
+  .badge-green{background:#dcfce7;color:#166534}
+  .empty{text-align:center;color:#94a3b8;padding:24px;font-style:italic;background:#f8fafc;border-radius:12px;font-size:13.5px}
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:12px 22px;border-radius:11px;font-size:13.5px;font-weight:600;opacity:0;transition:.28s;z-index:200;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.ok{background:#166534}
+  .toast.err{background:#991b1b}
+</style>
 </head>
 <body>
-  <div class="login-wrap">
-    <div class="login-card">
-      <div class="logo">🚐</div>
-      <h1>TransGo</h1>
-      <p class="sub">Sistem Transportasi Penumpang</p>
 
-      <div class="role-tabs">
-        <button class="role-tab active">Customer</button>
-        <button class="role-tab">Driver</button>
-        <button class="role-tab">Admin</button>
-      </div>
+<!-- ============ LOGIN ============ -->
+<div id="loginPage" class="login-wrap">
+  <div class="login-card">
+    <div class="logo">🚐</div>
+    <h1>TransGo</h1>
+    <p class="sub">Sistem Transportasi Penumpang</p>
 
+    <div class="role-tabs" id="roleTabs">
+      <button class="role-tab active" data-role="customer">Customer</button>
+      <button class="role-tab" data-role="driver">Driver</button>
+      <button class="role-tab" data-role="admin">Admin</button>
+    </div>
+
+    <form id="loginForm">
       <label class="field">
         <span>Username</span>
-        <input type="text" class="input" placeholder="Masukkan username">
+        <input id="username" class="input" required placeholder="Masukkan username" autocomplete="username" />
       </label>
-
       <label class="field">
         <span>Password</span>
-        <input type="password" class="input" placeholder="Masukkan password">
+        <input id="password" type="password" class="input" required placeholder="Masukkan password" autocomplete="current-password" />
       </label>
+      <div id="loginError" class="error"></div>
+      <button class="btn btn-primary btn-block" type="submit">Masuk</button>
+    </form>
 
-      <button class="btn btn-primary">Masuk</button>
-    </div>
+    <div class="info" id="demoInfo"></div>
   </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" style="display:none">
+  <header class="topbar">
+    <div class="brand">🚐 <span>TransGo</span></div>
+    <div class="userbox">
+      <div class="uinfo">
+        <span id="uName"></span>
+        <small id="uRole"></small>
+      </div>
+      <button id="logoutBtn" class="btn btn-ghost">Keluar</button>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ============================================
+   ⬇️⬇️⬇️ GANTI 2 BARIS DI BAWAH INI ⬇️⬇️⬇️
+   ============================================ */
+const SUPABASE_URL = 'https://xxxxx.supabase.co';        // ⬅️ GANTI INI
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6...';  // ⬅️ GANTI INI
+/* ============================================
+   ⬆️⬆️⬆️ JANGAN GANTI YANG LAIN ⬆️⬆️⬆️
+   ============================================ */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ============ STATE ============ */
+let currentUser = null;
+let loginRole = 'customer';
+
+/* ============ UTIL ============ */
+const $ = id => document.getElementById(id);
+const rupiah = n => 'Rp ' + new Intl.NumberFormat('id-ID').format(n);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function toast(msg, type=''){
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.className = 'toast', 2600);
+}
+
+function statusBadge(s){
+  const map = {
+    pending: ['Menunggu Driver','amber'],
+    accepted: ['Driver Ditugaskan','blue'],
+    completed: ['Selesai','green'],
+    cancelled: ['Dibatalkan','amber']
+  };
+  const [txt, cls] = map[s] || [s, 'blue'];
+  return `<span class="badge badge-${cls}">${txt}</span>`;
+}
+
+/* ============ LOGIN ============ */
+const DEMO = {
+  customer: '<b>Demo Customer</b><br>Username: <b>budi</b> | Password: <b>123</b>',
+  driver:   '<b>Demo Driver</b><br>Username: <b>andi</b> | Password: <b>123</b>',
+  admin:    '<b>Demo Admin</b><br>Username: <b>admin</b> | Password: <b>admin</b>'
+};
+
+$('roleTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.role-tab');
+  if(!btn) return;
+  document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loginRole = btn.dataset.role;              // ⬅️ pakai data-role (sudah lowercase)
+  $('demoInfo').innerHTML = DEMO[loginRole];
+  $('loginError').textContent = '';
+});
+
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const u = $('username').value.trim();
+  const p = $('password').value;
+
+  console.log('🔍 Login attempt:', { username: u, role: loginRole });
+  $('loginError').textContent = 'Memproses...';
+
+  try {
+    const { data, error } = await sb.from('users')
+      .select('*')
+      .eq('username', u)
+      .eq('password', p)
+      .eq('role', loginRole)
+      .maybeSingle();
+
+    console.log('📥 Response:', { data, error });
+
+    if(error){
+      $('loginError').textContent = '❌ Error: ' + error.message;
+      return;
+    }
+    if(!data){
+      $('loginError').textContent = '❌ Username atau password salah.';
+      return;
+    }
+
+    console.log('✅ Login berhasil:', data);
+    currentUser = data;
+    $('loginError').textContent = '';
+    showApp();
+  } catch(err){
+    console.error('💥 Exception:', err);
+    $('loginError').textContent = '❌ ' + err.message;
+  }
+});
+
+$('logoutBtn').addEventListener('click', () => {
+  currentUser = null;
+  $('app').style.display = 'none';
+  $('loginPage').style.display = 'flex';
+  $('username').value = '';
+  $('password').value = '';
+  $('loginError').textContent = '';
+});
+
+function showApp(){
+  $('loginPage').style.display = 'none';
+  $('app').style.display = 'block';
+  $('uName').textContent = currentUser.name;
+  $('uRole').textContent = currentUser.role;
+  render();
+}
+
+/* ============ ROUTER ============ */
+async function render(){
+  if(!currentUser) return;
+  if(currentUser.role === 'customer') await renderCustomer();
+  else if(currentUser.role === 'driver') await renderDriver();
+  else await renderAdmin();
+}
+
+/* ============ CUSTOMER ============ */
+async function renderCustomer(){
+  const { data: settings } = await sb.from('settings').select('*').eq('id', 1).single();
+  const { data: services } = await sb.from('services').select('*').eq('active', true);
+  const { data: orders }   = await sb.from('orders').select('*').eq('customer_id', currentUser.id).order('id', { ascending: false });
+
+  const s = settings || { base_fare: 15000, per_passenger: 5000 };
+  const svcs = services || [];
+  const ords = orders || [];
+  const today = new Date().toISOString().split('T')[0];
+
+  $('main').innerHTML = `
+    <div class="card">
+      <h3>Pesan Perjalanan</h3>
+      <form id="bookingForm">
+        <div class="grid2">
+          <label class="field"><span>Titik Jemput *</span><input class="input" id="from" required placeholder="Jl. Sudirman No. 10"></label>
+          <label class="field"><span>Tujuan *</span><input class="input" id="to" required placeholder="Bandara Soekarno-Hatta"></label>
+        </div>
+        <div class="grid2">
+          <label class="field"><span>Tanggal</span><input type="date" class="input" id="date" value="${today}" required></label>
+          <label class="field"><span>Jam</span><input type="time" class="input" id="time" value="08:00" required></label>
+        </div>
+        <label class="field"><span>Jumlah Penumpang</span><input type="number" class="input" id="passengers" min="1" max="12" value="1" required></label>
+        <label class="field"><span>Pembayaran</span>
+          <select class="input" id="payment">
+            <option>Tunai</option><option>Transfer Bank</option><option>E-Wallet</option>
+          </select>
+        </label>
+        <div style="margin:14px 0 8px;font-size:13.5px;font-weight:600;color:#334155">Layanan Tambahan</div>
+        <div class="services" id="serviceList">
+          ${svcs.length ? svcs.map(sv => `
+            <label class="service-item">
+              <input type="checkbox" class="svc-check" value="${sv.id}" data-price="${sv.price}">
+              <span>${esc(sv.name)}</span>
+              <b>${sv.price > 0 ? rupiah(sv.price) : 'Gratis'}</b>
+            </label>`).join('') : '<div class="empty">Belum ada layanan.</div>'}
+        </div>
+        <div class="total-box">
+          <span>Total Pembayaran</span>
+          <strong id="totalPrice">${rupiah(s.base_fare + s.per_passenger)}</strong>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">🚐 Pesan Sekarang</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Pesanan Saya (${ords.length})</h3>
+      ${ords.length ? ords.map(o => `
+        <div class="order">
+          <div class="order-top">
+            <div class="route">${esc(o.from_location)} → ${esc(o.to_location)}</div>
+            ${statusBadge(o.status)}
+          </div>
+          <div class="order-meta">
+            📅 ${esc(o.date)} ${esc(o.time)} · 👥 ${o.passengers} penumpang<br>
+            🧑‍✈️ Driver: <b>${o.driver_name ? esc(o.driver_name) : 'Belum ada'}</b>
+          </div>
+          <div class="order-foot">
+            <div class="price">${rupiah(o.total_price)}</div>
+          </div>
+        </div>`).join('') : '<div class="empty">Belum ada pesanan.</div>'}
+    </div>
+  `;
+
+  function calcTotal(){
+    const pax = Math.max(1, parseInt($('passengers').value) || 1);
+    let total = s.base_fare + (s.per_passenger * pax);
+    document.querySelectorAll('.svc-check:checked').forEach(c => total += parseInt(c.dataset.price) || 0);
+    $('totalPrice').textContent = rupiah(total);
+  }
+  $('bookingForm').addEventListener('input', calcTotal);
+  $('bookingForm').addEventListener('change', calcTotal);
+
+  $('bookingForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const from = $('from').value.trim();
+    const to   = $('to').value.trim();
+    if(!from || !to) return;
+
+    const passengers = parseInt($('passengers').value) || 1;
+    const ids = [...document.querySelectorAll('.svc-check:checked')].map(c => parseInt(c.value));
+    const chosen = svcs.filter(sv => ids.includes(sv.id));
+    const svcTotal = chosen.reduce((a, c) => a + c.price, 0);
+    const baseTotal = s.base_fare + (s.per_passenger * passengers);
+
+    const order = {
+      customer_id: currentUser.id,
+      customer_name: currentUser.name,
+      from_location: from,
+      to_location: to,
+      date: $('date').value,
+      time: $('time').value,
+      passengers,
+      payment: $('payment').value,
+      services: chosen.map(c => ({ name: c.name, price: c.price })),
+      base_price: baseTotal,
+      total_price: baseTotal + svcTotal,
+      status: 'pending'
+    };
+
+    const { error } = await sb.from('orders').insert(order);
+    if(error){
+      toast('❌ ' + error.message, 'err');
+      return;
+    }
+    toast('✅ Pesanan berhasil!', 'ok');
+    renderCustomer();
+  });
+}
+
+/* ============ DRIVER ============ */
+async function renderDriver(){
+  const { data: pending } = await sb.from('orders').select('*').eq('status', 'pending').order('id', { ascending: false });
+  const { data: mine }    = await sb.from('orders').select('*').eq('driver_id', currentUser.id).order('id', { ascending: false });
+
+  const pend = pending || [];
+  const my = mine || [];
+
+  $('main').innerHTML = `
+    <div class="card">
+      <h3>Order Tersedia (${pend.length})</h3>
+      ${pend.length ? pend.map(o => orderCardDriver(o, 'take')).join('') : '<div class="empty">Belum ada order.</div>'}
+    </div>
+    <div class="card">
+      <h3>Order Saya (${my.length})</h3>
+      ${my.length ? my.map(o => orderCardDriver(o, 'finish')).join('') : '<div class="empty">Belum ada order diambil.</div>'}
+    </div>
+  `;
+
+  $('main').addEventListener('click', async e => {
+    const btn = e.target.closest('button[data-action]');
+    if(!btn) return;
+    const id = parseInt(btn.dataset.id);
+
+    if(btn.dataset.action === 'take'){
+      const { error } = await sb.from('orders').update({
+        status: 'accepted',
+        driver_id: currentUser.id,
+        driver_name: currentUser.name
+      }).eq('id', id);
+      if(!error){ toast('✅ Order diambil', 'ok'); renderDriver(); }
+    }
+    if(btn.dataset.action === 'finish'){
+      const { error } = await sb.from('orders').update({ status: 'completed' }).eq('id', id);
+      if(!error){ toast('🎉 Order selesai', 'ok'); renderDriver(); }
+    }
+  });
+}
+
+function orderCardDriver(o, mode){
+  const btn = mode === 'take'
+    ? (o.status === 'pending' ? `<button class="btn btn-primary" data-action="take" data-id="${o.id}">Ambil Order</button>` : '')
+    : (o.status === 'accepted' ? `<button class="btn btn-primary" data-action="finish" data-id="${o.id}">Selesaikan</button>` : '');
+
+  return `
+    <div class="order">
+      <div class="order-top">
+        <div class="route">${esc(o.from_location)} → ${esc(o.to_location)}</div>
+        ${statusBadge(o.status)}
+      </div>
+      <div class="order-meta">
+        👤 ${esc(o.customer_name)} · 👥 ${o.passengers} penumpang<br>
+        📅 ${esc(o.date)} pukul ${esc(o.time)}
+      </div>
+      <div class="order-foot">
+        <div class="price">${rupiah(o.total_price)}</div>
+        ${btn}
+      </div>
+    </div>`;
+}
+
+/* ============ ADMIN ============ */
+async function renderAdmin(){
+  const { data: users }    = await sb.from('users').select('*').order('id');
+  const { data: orders }   = await sb.from('orders').select('*').order('id', { ascending: false });
+  const { data: services } = await sb.from('services').select('*').order('id');
+
+  const usrs = users || [];
+  const ords = orders || [];
+  const svcs = services || [];
+  const completed = ords.filter(o => o.status === 'completed');
+  const revenue = completed.reduce((a, o) => a + o.total_price, 0);
+
+  $('main').innerHTML = `
+    <div class="card">
+      <h3>Dashboard</h3>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+        <div><small style="color:#64748b">Total Pesanan</small><div style="font-size:22px;font-weight:700">${ords.length}</div></div>
+        <div><small style="color:#64748b">Menunggu</small><div style="font-size:22px;font-weight:700">${ords.filter(o=>o.status==='pending').length}</div></div>
+        <div><small style="color:#64748b">Selesai</small><div style="font-size:22px;font-weight:700">${completed.length}</div></div>
+        <div><small style="color:#64748b">Pendapatan</small><div style="font-size:18px;font-weight:700">${rupiah(revenue)}</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Tambah Layanan</h3>
+      <form id="addSvcForm" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+        <label class="field" style="flex:2;min-width:150px;margin:0"><span>Nama</span><input class="input" id="svcName" required></label>
+        <label class="field" style="flex:1;min-width:100px;margin:0"><span>Harga</span><input class="input" type="number" id="svcPrice" value="5000" required></label>
+        <button class="btn btn-primary" type="submit">+ Tambah</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Layanan (${svcs.length})</h3>
+      ${svcs.map(sv => `
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9">
+          <div><b>${esc(sv.name)}</b> · <span style="color:#64748b;font-size:13px">${sv.price>0?rupiah(sv.price):'Gratis'}</span></div>
+          <button class="btn btn-ghost" style="color:#dc2626" data-del-svc="${sv.id}">Hapus</button>
+        </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <h3>Pengguna (${usrs.length})</h3>
+      ${usrs.map(u => `
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9">
+          <div><b>${esc(u.name)}</b> <small style="color:#64748b">@${esc(u.username)}</small></div>
+          <span class="badge badge-blue">${esc(u.role)}</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <h3>Semua Pesanan (${ords.length})</h3>
+      ${ords.length ? ords.map(o => `
+        <div style="padding:10px 0;border-bottom:1px solid #f1f5f9">
+          <div style="font-weight:700">${esc(o.from_location)} → ${esc(o.to_location)}</div>
+          <div style="color:#64748b;font-size:13px;margin-top:4px">
+            ${esc(o.customer_name)} · ${rupiah(o.total_price)} · ${statusBadge(o.status)}
+          </div>
+        </div>`).join('') : '<div class="empty">Belum ada pesanan.</div>'}
+    </div>
+  `;
+
+  $('addSvcForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = $('svcName').value.trim();
+    const price = parseInt($('svcPrice').value) || 0;
+    if(!name) return;
+    const { error } = await sb.from('services').insert({ name, price, active: true });
+    if(error){ toast('❌ ' + error.message, 'err'); return; }
+    toast('✅ Layanan ditambahkan', 'ok');
+    renderAdmin();
+  });
+
+  $('main').addEventListener('click', async e => {
+    const btn = e.target.closest('button[data-del-svc]');
+    if(!btn) return;
+    const id = parseInt(btn.dataset.delSvc);
+    if(!confirm('Hapus layanan ini?')) return;
+    await sb.from('services').delete().eq('id', id);
+    toast('Layanan dihapus', 'ok');
+    renderAdmin();
+  });
+}
+
+/* ============ INIT ============ */
+$('demoInfo').innerHTML = DEMO.customer;
+
+// Cek URL/KEY masih placeholder
+if(SUPABASE_URL.includes('xxxxx')){
+  setTimeout(() => {
+    $('loginError').textContent = '⚠️ Isi SUPABASE_URL dan SUPABASE_KEY dulu!';
+  }, 500);
+}
+</script>
 </body>
 </html>
