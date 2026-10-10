@@ -7,42 +7,189 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;color:#0f172a;min-height:100vh}
-  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#1e3a8a,#2563eb,#0ea5e9)}
-  .login-card{background:#fff;width:100%;max-width:400px;border-radius:20px;padding:34px 30px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
-  .logo{font-size:44px;text-align:center}
-  .login-card h1{text-align:center;font-size:26px;margin:8px 0 4px}
-  .sub{text-align:center;color:#64748b;font-size:13px;margin-bottom:22px}
-  .role-tabs{display:flex;background:#f1f5f9;border-radius:12px;padding:5px;gap:4px;margin-bottom:20px}
-  .role-tab{flex:1;border:none;background:transparent;padding:10px 6px;border-radius:9px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit}
-  .role-tab.active{background:#fff;color:#2563eb;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;color:#0f172a;min-height:100vh;line-height:1.6}
+
+  /* ============ PORTAL (PILIH PERAN) ============ */
+  .portal{
+    min-height:100vh;
+    background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#334155 100%);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    position:relative;overflow:hidden;
+  }
+  .portal::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 20% 30%, rgba(37,99,235,.25) 0%, transparent 45%),
+               radial-gradient(circle at 80% 70%, rgba(14,165,233,.2) 0%, transparent 45%);
+  }
+  .portal-inner{position:relative;z-index:1;text-align:center;max-width:1000px;width:100%}
+  .portal-logo{font-size:64px;line-height:1;margin-bottom:14px;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .portal h1{color:#fff;font-size:clamp(28px,5vw,40px);letter-spacing:-1px;font-weight:800;margin-bottom:8px}
+  .portal .sub{color:#cbd5e1;font-size:15px;margin-bottom:44px}
+
+  .roles{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+    max-width:900px;margin:0 auto;
+  }
+  @media(max-width:820px){.roles{grid-template-columns:1fr;max-width:400px}}
+
+  .role-card{
+    background:#fff;border-radius:20px;padding:32px 26px;
+    cursor:pointer;transition:.3s;text-align:center;
+    border:2px solid transparent;position:relative;overflow:hidden;
+  }
+  .role-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:5px;
+    transition:.3s;
+  }
+  .role-card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(0,0,0,.35)}
+  .role-card .icon{font-size:52px;margin-bottom:14px;display:block}
+  .role-card h3{font-size:20px;margin-bottom:8px;letter-spacing:-.3px}
+  .role-card p{font-size:13.5px;color:#64748b;line-height:1.6;margin-bottom:18px}
+  .role-card .btn-masuk{
+    display:inline-block;padding:11px 26px;border-radius:10px;
+    font-size:14px;font-weight:700;color:#fff;transition:.2s;
+  }
+
+  .role-card.customer::before{background:linear-gradient(90deg,#2563eb,#0ea5e9)}
+  .role-card.customer .btn-masuk{background:#2563eb}
+  .role-card.customer:hover .btn-masuk{background:#1d4ed8}
+
+  .role-card.driver::before{background:linear-gradient(90deg,#16a34a,#10b981)}
+  .role-card.driver .btn-masuk{background:#16a34a}
+  .role-card.driver:hover .btn-masuk{background:#15803d}
+
+  .role-card.admin::before{background:linear-gradient(90deg,#dc2626,#f97316)}
+  .role-card.admin .btn-masuk{background:#dc2626}
+  .role-card.admin:hover .btn-masuk{background:#b91c1c}
+
+  /* ============ LOGIN UMUM ============ */
+  .login-page{
+    min-height:100vh;display:none;align-items:center;justify-content:center;
+    padding:24px;position:relative;overflow:hidden;
+  }
+  .login-page.active{display:flex}
+  .login-page::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 80% 20%, rgba(255,255,255,.15) 0%, transparent 50%);
+  }
+
+  /* Warna berbeda per peran */
+  .login-customer{background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 55%,#0ea5e9 100%)}
+  .login-driver{background:linear-gradient(135deg,#064e3b 0%,#16a34a 55%,#10b981 100%)}
+  .login-admin{background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 55%,#f97316 100%)}
+
+  .login-box{
+    background:#fff;width:100%;max-width:420px;
+    border-radius:22px;padding:36px 32px;
+    box-shadow:0 24px 60px rgba(0,0,0,.35);
+    position:relative;z-index:1;
+    animation:slideIn .4s ease;
+  }
+  @keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+  .login-header{text-align:center;margin-bottom:26px}
+  .login-header .icon-circle{
+    width:72px;height:72px;border-radius:20px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:36px;margin:0 auto 14px;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+  }
+  .login-customer .icon-circle{background:linear-gradient(135deg,#2563eb,#0ea5e9)}
+  .login-driver .icon-circle{background:linear-gradient(135deg,#16a34a,#10b981)}
+  .login-admin .icon-circle{background:linear-gradient(135deg,#dc2626,#f97316)}
+
+  .login-header h2{font-size:22px;margin-bottom:4px;letter-spacing:-.4px}
+  .login-header .role-label{
+    display:inline-block;font-size:11px;font-weight:800;
+    padding:4px 12px;border-radius:20px;letter-spacing:.8px;text-transform:uppercase;
+    margin-top:6px;
+  }
+  .login-customer .role-label{background:#dbeafe;color:#1e40af}
+  .login-driver .role-label{background:#dcfce7;color:#166534}
+  .login-admin .role-label{background:#fee2e2;color:#991b1b}
+
   .field{display:block;margin-bottom:14px}
   .field span{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#334155}
-  .input{width:100%;padding:11px 13px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;font-family:inherit}
-  .input:focus{border-color:#2563eb;box-shadow:0 0 0 3px #dbeafe}
-  .btn{border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
-  .btn-primary{background:#2563eb;color:#fff}
-  .btn-primary:hover{background:#1d4ed8}
-  .btn-block{width:100%;padding:13px;font-size:15px;margin-top:6px}
-  .btn-ghost{background:transparent;color:#64748b;border:1.5px solid #e2e8f0;padding:7px 12px;font-size:12.5px}
-  .error{color:#dc2626;font-size:13px;min-height:18px;margin-bottom:6px}
-  .info{margin-top:18px;padding:12px 14px;background:#f8fafc;border:1px dashed #e2e8f0;border-radius:10px;font-size:12px;color:#64748b;line-height:1.7}
-  .info b{color:#334155}
-  .topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+  .input{
+    width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;
+    border-radius:11px;font-size:14px;outline:none;font-family:inherit;
+    background:#fff;transition:.2s;
+  }
+  .input:focus{box-shadow:0 0 0 3px rgba(37,99,235,.15);border-color:#2563eb}
+  .login-driver .input:focus{border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.15)}
+  .login-admin .input:focus{border-color:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.15)}
+
+  .btn{
+    border:none;border-radius:11px;padding:12px 16px;font-size:14px;
+    font-weight:700;cursor:pointer;font-family:inherit;transition:.18s;
+  }
+  .btn-block{width:100%;padding:14px;font-size:15px;margin-top:6px}
+  .login-customer .btn-primary{background:#2563eb;color:#fff}
+  .login-customer .btn-primary:hover{background:#1d4ed8}
+  .login-driver .btn-primary{background:#16a34a;color:#fff}
+  .login-driver .btn-primary:hover{background:#15803d}
+  .login-admin .btn-primary{background:#dc2626;color:#fff}
+  .login-admin .btn-primary:hover{background:#b91c1c}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed}
+
+  .btn-back{
+    background:transparent;border:1.5px solid #e2e8f0;color:#64748b;
+    padding:9px 14px;font-size:13px;border-radius:9px;cursor:pointer;
+    width:100%;margin-top:10px;font-family:inherit;font-weight:600;
+    transition:.18s;
+  }
+  .btn-back:hover{background:#f8fafc;color:#334155}
+
+  .error{color:#dc2626;font-size:13px;min-height:18px;margin-bottom:8px;word-break:break-word;text-align:center}
+
+  .demo-hint{
+    margin-top:18px;padding:12px 14px;background:#f8fafc;
+    border:1px dashed #cbd5e1;border-radius:10px;
+    font-size:12px;color:#64748b;text-align:center;line-height:1.7;
+  }
+  .demo-hint b{color:#334155}
+
+  /* ============ SETUP ============ */
+  .setup-wrap{
+    min-height:100vh;display:none;align-items:center;justify-content:center;
+    padding:20px;background:linear-gradient(135deg,#1e3a8a,#2563eb,#0ea5e9);
+  }
+  .setup-wrap.active{display:flex}
+  .setup-card{background:#fff;width:100%;max-width:560px;border-radius:20px;padding:32px 30px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+  .setup-card h1{font-size:22px;margin-bottom:6px;text-align:center}
+  .setup-card p{font-size:13.5px;color:#64748b;text-align:center;margin-bottom:22px}
+  .help-box{background:#eff6ff;border-left:4px solid #2563eb;padding:12px 14px;border-radius:8px;font-size:12.5px;color:#1e40af;margin-bottom:16px;line-height:1.65}
+  .help-box a{color:#1e40af;font-weight:700}
+  textarea.input{font-family:monospace;font-size:12px;resize:vertical;min-height:60px}
+  .status-box{padding:10px 12px;border-radius:9px;font-size:12.5px;margin-bottom:12px;display:none;line-height:1.5}
+  .status-box.show{display:block}
+  .status-ok{background:#dcfce7;color:#166534;border:1px solid #86efac}
+  .status-err{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+  .status-load{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+
+  /* ============ APP ============ */
+  #app{display:none}
+  .topbar{
+    background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 24px;
+    display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:10;
+  }
   .brand{font-size:17px;display:flex;align-items:center;gap:8px;font-weight:700}
   .userbox{display:flex;align-items:center;gap:14px}
   .uinfo{text-align:right;line-height:1.3}
   .uinfo span{font-weight:600;font-size:14px;display:block}
   .uinfo small{color:#64748b;font-size:11.5px;text-transform:uppercase}
+  .btn-ghost{background:transparent;color:#64748b;border:1.5px solid #e2e8f0;padding:7px 12px;font-size:12.5px;border-radius:9px;cursor:pointer;font-family:inherit;font-weight:600}
   main{max-width:900px;margin:0 auto;padding:24px}
-  .card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,.05);margin-bottom:16px}
+  .card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,.05);margin-bottom:16px;border:1px solid #eef2f7}
   .card h3{font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
   .card h3::before{content:"";width:4px;height:18px;background:#2563eb;border-radius:3px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:640px){.grid2{grid-template-columns:1fr}}
   .services{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
   @media(max-width:640px){.services{grid-template-columns:1fr}}
-  .service-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;font-size:13.5px}
+  .service-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;font-size:13.5px;transition:.15s;background:#fff}
   .service-item:hover{border-color:#bfdbfe;background:#f8fafc}
   .service-item input{accent-color:#2563eb;width:16px;height:16px}
   .service-item span{flex:1}
@@ -56,12 +203,21 @@
   .order-meta{font-size:12.5px;color:#64748b;line-height:1.85}
   .order-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:11px;border-top:1px dashed #e2e8f0;gap:10px;flex-wrap:wrap}
   .price{font-weight:700;font-size:15px;color:#1e3a8a}
-  .badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+  .badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;display:inline-block}
   .badge-amber{background:#fef3c7;color:#92400e}
   .badge-blue{background:#dbeafe;color:#1e40af}
   .badge-green{background:#dcfce7;color:#166534}
   .empty{text-align:center;color:#94a3b8;padding:24px;font-style:italic;background:#f8fafc;border-radius:12px;font-size:13.5px}
-  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:12px 22px;border-radius:11px;font-size:13.5px;font-weight:600;opacity:0;transition:.28s;z-index:200;pointer-events:none}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:640px){.stats{grid-template-columns:1fr 1fr}}
+  .stat{background:#f8fafc;padding:14px;border-radius:10px;border-left:3px solid #2563eb}
+  .stat small{color:#64748b;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  .stat div{font-size:22px;font-weight:700;margin-top:4px}
+  .btn-sm{padding:7px 12px;font-size:12px;border-radius:8px}
+  .btn-primary{background:#2563eb;color:#fff;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .btn-green{background:#16a34a;color:#fff}
+
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:12px 22px;border-radius:11px;font-size:13.5px;font-weight:600;opacity:0;transition:.28s;z-index:200;pointer-events:none;max-width:90%;text-align:center}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .toast.ok{background:#166534}
   .toast.err{background:#991b1b}
@@ -69,38 +225,160 @@
 </head>
 <body>
 
-<!-- ============ LOGIN ============ -->
-<div id="loginPage" class="login-wrap">
-  <div class="login-card">
-    <div class="logo">🚐</div>
-    <h1>TransGo</h1>
-    <p class="sub">Sistem Transportasi Penumpang</p>
+<!-- ============ SETUP PAGE ============ -->
+<div id="setupPage" class="setup-wrap">
+  <div class="setup-card">
+    <div style="font-size:40px;text-align:center;margin-bottom:8px">🔧</div>
+    <h1>Setup Awal (Sekali Saja)</h1>
+    <p>Paste URL dan KEY dari Supabase di bawah ini</p>
 
-    <div class="role-tabs" id="roleTabs">
-      <button class="role-tab active" data-role="customer">Customer</button>
-      <button class="role-tab" data-role="driver">Driver</button>
-      <button class="role-tab" data-role="admin">Admin</button>
+    <div class="help-box">
+      <b>📖 Cara ambil URL &amp; KEY:</b><br>
+      1. Buka <a href="https://supabase.com/dashboard" target="_blank">supabase.com/dashboard</a><br>
+      2. Pilih project → klik <b>⚙️ Settings</b> → menu <b>API</b><br>
+      3. Copy <b>Project URL</b> dan <b>anon public key</b>
     </div>
 
-    <form id="loginForm">
+    <label class="field">
+      <span>1️⃣ Project URL</span>
+      <input type="text" id="setupUrl" class="input" placeholder="https://abcdefghijklm.supabase.co" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span>2️⃣ anon public key</span>
+      <textarea id="setupKey" class="input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." autocomplete="off"></textarea>
+    </label>
+
+    <div id="setupStatus" class="status-box"></div>
+
+    <button class="btn btn-primary btn-block" id="setupSaveBtn" style="background:#2563eb">💾 Simpan &amp; Hubungkan</button>
+  </div>
+</div>
+
+<!-- ============ PORTAL: PILIH PERAN ============ -->
+<div id="portalPage" class="portal">
+  <div class="portal-inner">
+    <div class="portal-logo">🚐</div>
+    <h1>TransGo</h1>
+    <p class="sub">Sistem Transportasi Penumpang — Pilih Peran Anda</p>
+
+    <div class="roles">
+      <div class="role-card customer" data-role="customer">
+        <span class="icon">🧑‍💼</span>
+        <h3>Customer</h3>
+        <p>Pesan perjalanan, pilih layanan tambahan, dan lacak status pesanan.</p>
+        <span class="btn-masuk">Masuk sebagai Customer</span>
+      </div>
+
+      <div class="role-card driver" data-role="driver">
+        <span class="icon">🧑‍✈️</span>
+        <h3>Driver</h3>
+        <p>Lihat order masuk, ambil pesanan, dan selesaikan perjalanan.</p>
+        <span class="btn-masuk">Masuk sebagai Driver</span>
+      </div>
+
+      <div class="role-card admin" data-role="admin">
+        <span class="icon">👨‍💼</span>
+        <h3>Admin</h3>
+        <p>Kelola layanan, pengguna, pesanan, dan konfigurasi sistem.</p>
+        <span class="btn-masuk">Masuk sebagai Admin</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LOGIN CUSTOMER ============ -->
+<div id="loginCustomer" class="login-page login-customer">
+  <div class="login-box">
+    <div class="login-header">
+      <div class="icon-circle">🧑‍💼</div>
+      <h2>Login Customer</h2>
+      <span class="role-label">Customer</span>
+    </div>
+
+    <form class="loginForm" data-role="customer">
       <label class="field">
         <span>Username</span>
-        <input id="username" class="input" required placeholder="Masukkan username" autocomplete="username" />
+        <input class="input username" required placeholder="Masukkan username" autocomplete="username" />
       </label>
       <label class="field">
         <span>Password</span>
-        <input id="password" type="password" class="input" required placeholder="Masukkan password" autocomplete="current-password" />
+        <input class="input password" type="password" required placeholder="Masukkan password" autocomplete="current-password" />
       </label>
-      <div id="loginError" class="error"></div>
-      <button class="btn btn-primary btn-block" type="submit">Masuk</button>
+      <div class="error"></div>
+      <button type="submit" class="btn btn-primary btn-block">🚐 Masuk</button>
+      <button type="button" class="btn-back" data-back>← Kembali ke Pilihan Peran</button>
     </form>
 
-    <div class="info" id="demoInfo"></div>
+    <div class="demo-hint">
+      <b>Demo Customer</b><br>
+      Username: <b>budi</b> | Password: <b>123</b>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LOGIN DRIVER ============ -->
+<div id="loginDriver" class="login-page login-driver">
+  <div class="login-box">
+    <div class="login-header">
+      <div class="icon-circle">🧑‍✈️</div>
+      <h2>Login Driver</h2>
+      <span class="role-label">Driver</span>
+    </div>
+
+    <form class="loginForm" data-role="driver">
+      <label class="field">
+        <span>Username</span>
+        <input class="input username" required placeholder="Masukkan username" autocomplete="username" />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input class="input password" type="password" required placeholder="Masukkan password" autocomplete="current-password" />
+      </label>
+      <div class="error"></div>
+      <button type="submit" class="btn btn-primary btn-block">🚗 Masuk</button>
+      <button type="button" class="btn-back" data-back>← Kembali ke Pilihan Peran</button>
+    </form>
+
+    <div class="demo-hint">
+      <b>Demo Driver</b><br>
+      Username: <b>andi</b> | Password: <b>123</b>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LOGIN ADMIN ============ -->
+<div id="loginAdmin" class="login-page login-admin">
+  <div class="login-box">
+    <div class="login-header">
+      <div class="icon-circle">👨‍💼</div>
+      <h2>Login Admin</h2>
+      <span class="role-label">Administrator</span>
+    </div>
+
+    <form class="loginForm" data-role="admin">
+      <label class="field">
+        <span>Username</span>
+        <input class="input username" required placeholder="Masukkan username" autocomplete="username" />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input class="input password" type="password" required placeholder="Masukkan password" autocomplete="current-password" />
+      </label>
+      <div class="error"></div>
+      <button type="submit" class="btn btn-primary btn-block">🔐 Masuk</button>
+      <button type="button" class="btn-back" data-back>← Kembali ke Pilihan Peran</button>
+    </form>
+
+    <div class="demo-hint">
+      <b>Demo Admin</b><br>
+      Username: <b>admin</b> | Password: <b>admin</b>
+    </div>
   </div>
 </div>
 
 <!-- ============ APP ============ -->
-<div id="app" style="display:none">
+<div id="app">
   <header class="topbar">
     <div class="brand">🚐 <span>TransGo</span></div>
     <div class="userbox">
@@ -108,7 +386,7 @@
         <span id="uName"></span>
         <small id="uRole"></small>
       </div>
-      <button id="logoutBtn" class="btn btn-ghost">Keluar</button>
+      <button id="logoutBtn" class="btn-ghost">Keluar</button>
     </div>
   </header>
   <main id="main"></main>
@@ -118,22 +396,15 @@
 
 <script>
 /* ============================================
-   ⬇️⬇️⬇️ GANTI 2 BARIS DI BAWAH INI ⬇️⬇️⬇️
+   GLOBAL
    ============================================ */
-const SUPABASE_URL = 'https://xxxxx.supabase.co';        // ⬅️ GANTI INI
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6...';  // ⬅️ GANTI INI
-/* ============================================
-   ⬆️⬆️⬆️ JANGAN GANTI YANG LAIN ⬆️⬆️⬆️
-   ============================================ */
-
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-/* ============ STATE ============ */
+let SUPABASE_URL = '';
+let SUPABASE_KEY = '';
+let sb = null;
 let currentUser = null;
-let loginRole = 'customer';
 
-/* ============ UTIL ============ */
 const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
 const rupiah = n => 'Rp ' + new Intl.NumberFormat('id-ID').format(n);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -142,8 +413,16 @@ function toast(msg, type=''){
   t.textContent = msg;
   t.className = 'toast show ' + type;
   clearTimeout(t._tid);
-  t._tid = setTimeout(() => t.className = 'toast', 2600);
+  t._tid = setTimeout(() => t.className = 'toast', 2800);
 }
+
+function showStatus(elId, msg, type){
+  const el = $(elId);
+  el.className = 'status-box show status-' + type;
+  el.innerHTML = msg;
+}
+
+function hideStatus(elId){ $(elId).className = 'status-box'; }
 
 function statusBadge(s){
   const map = {
@@ -156,88 +435,214 @@ function statusBadge(s){
   return `<span class="badge badge-${cls}">${txt}</span>`;
 }
 
-/* ============ LOGIN ============ */
-const DEMO = {
-  customer: '<b>Demo Customer</b><br>Username: <b>budi</b> | Password: <b>123</b>',
-  driver:   '<b>Demo Driver</b><br>Username: <b>andi</b> | Password: <b>123</b>',
-  admin:    '<b>Demo Admin</b><br>Username: <b>admin</b> | Password: <b>admin</b>'
-};
+/* ============================================
+   NAVIGASI HALAMAN
+   ============================================ */
+function hideAll(){
+  $('setupPage').classList.remove('active');
+  $('portalPage').style.display = 'none';
+  $('loginCustomer').classList.remove('active');
+  $('loginDriver').classList.remove('active');
+  $('loginAdmin').classList.remove('active');
+  $('app').style.display = 'none';
+}
 
-$('roleTabs').addEventListener('click', e => {
-  const btn = e.target.closest('.role-tab');
-  if(!btn) return;
-  document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  loginRole = btn.dataset.role;              // ⬅️ pakai data-role (sudah lowercase)
-  $('demoInfo').innerHTML = DEMO[loginRole];
-  $('loginError').textContent = '';
-});
+function showSetup(){
+  hideAll();
+  $('setupPage').classList.add('active');
+}
 
-$('loginForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const u = $('username').value.trim();
-  const p = $('password').value;
+function showPortal(){
+  hideAll();
+  $('portalPage').style.display = 'flex';
+}
 
-  console.log('🔍 Login attempt:', { username: u, role: loginRole });
-  $('loginError').textContent = 'Memproses...';
+function showLogin(role){
+  hideAll();
+  const page = role === 'customer' ? $('loginCustomer')
+             : role === 'driver'   ? $('loginDriver')
+             : $('loginAdmin');
+  page.classList.add('active');
 
-  try {
-    const { data, error } = await sb.from('users')
-      .select('*')
-      .eq('username', u)
-      .eq('password', p)
-      .eq('role', loginRole)
-      .maybeSingle();
+  // Reset form & pesan error
+  const form = page.querySelector('.loginForm');
+  form.querySelector('.error').textContent = '';
+  form.querySelector('.username').value = '';
+  form.querySelector('.password').value = '';
+  setTimeout(() => form.querySelector('.username').focus(), 100);
+}
 
-    console.log('📥 Response:', { data, error });
+/* ============================================
+   SETUP WIZARD
+   ============================================ */
+$('setupSaveBtn').addEventListener('click', async () => {
+  const url = $('setupUrl').value.trim();
+  const key = $('setupKey').value.trim();
+
+  hideStatus('setupStatus');
+
+  if(!url || !key){
+    showStatus('setupStatus', '❌ URL dan KEY harus diisi!', 'err');
+    return;
+  }
+  if(!url.startsWith('https://')){
+    showStatus('setupStatus', '❌ URL harus diawali <b>https://</b>', 'err');
+    return;
+  }
+  if(!url.includes('.supabase.co')){
+    showStatus('setupStatus', '❌ URL harus mengandung <b>.supabase.co</b>', 'err');
+    return;
+  }
+  if(!key.startsWith('eyJ')){
+    showStatus('setupStatus', '❌ KEY harus diawali <b>eyJ</b>', 'err');
+    return;
+  }
+
+  showStatus('setupStatus', '⏳ Menguji koneksi...', 'load');
+  $('setupSaveBtn').disabled = true;
+
+  try{
+    const testClient = supabase.createClient(url, key);
+    const { error } = await testClient.from('users').select('*').limit(1);
 
     if(error){
-      $('loginError').textContent = '❌ Error: ' + error.message;
-      return;
-    }
-    if(!data){
-      $('loginError').textContent = '❌ Username atau password salah.';
+      let pesan = '❌ Gagal: ' + error.message;
+      if(error.message.includes('Invalid API key')){
+        pesan = '❌ <b>KEY salah.</b> Copy ulang anon public key dari Supabase.';
+      } else if(error.message.includes('does not exist')){
+        pesan = '❌ <b>Tabel belum dibuat.</b> Jalankan SQL CREATE TABLE.';
+      } else if(error.message.includes('row-level security')){
+        pesan = '❌ <b>RLS aktif.</b> Jalankan: ALTER TABLE users DISABLE ROW LEVEL SECURITY;';
+      }
+      showStatus('setupStatus', pesan, 'err');
+      $('setupSaveBtn').disabled = false;
       return;
     }
 
-    console.log('✅ Login berhasil:', data);
-    currentUser = data;
-    $('loginError').textContent = '';
-    showApp();
+    localStorage.setItem('transgo_url', url);
+    localStorage.setItem('transgo_key', key);
+    SUPABASE_URL = url;
+    SUPABASE_KEY = key;
+    sb = testClient;
+
+    showStatus('setupStatus', '✅ <b>Koneksi berhasil!</b> Mengalihkan...', 'ok');
+
+    setTimeout(() => {
+      showPortal();
+      $('setupSaveBtn').disabled = false;
+    }, 1000);
   } catch(err){
-    console.error('💥 Exception:', err);
-    $('loginError').textContent = '❌ ' + err.message;
+    showStatus('setupStatus', '💥 ' + err.message, 'err');
+    $('setupSaveBtn').disabled = false;
   }
 });
 
-$('logoutBtn').addEventListener('click', () => {
-  currentUser = null;
-  $('app').style.display = 'none';
-  $('loginPage').style.display = 'flex';
-  $('username').value = '';
-  $('password').value = '';
-  $('loginError').textContent = '';
+/* ============================================
+   PORTAL: PILIH PERAN
+   ============================================ */
+$$('.role-card').forEach(card => {
+  card.addEventListener('click', () => {
+    showLogin(card.dataset.role);
+  });
 });
 
+/* ============================================
+   LOGIN HANDLER (3 form, 1 logika)
+   ============================================ */
+$$('.loginForm').forEach(form => {
+  const role = form.dataset.role;
+
+  // Tombol kembali
+  form.querySelector('[data-back]').addEventListener('click', showPortal);
+
+  // Submit login
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const username = form.querySelector('.username').value.trim();
+    const password = form.querySelector('.password').value;
+    const errEl = form.querySelector('.error');
+    const btn = form.querySelector('button[type="submit"]');
+
+    errEl.textContent = '';
+
+    if(!username || !password){
+      errEl.textContent = '❌ Username dan password wajib diisi.';
+      return;
+    }
+
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Memproses...';
+
+    try{
+      const { data, error } = await sb.from('users')
+        .select('*')
+        .eq('username', username)
+        .eq('password', password)
+        .eq('role', role)
+        .maybeSingle();
+
+      if(error){
+        errEl.textContent = error.message.includes('Failed to fetch')
+          ? '❌ Koneksi ke server gagal. Cek internet.'
+          : '❌ ' + error.message;
+        btn.disabled = false;
+        btn.textContent = originalText;
+        return;
+      }
+
+      if(!data){
+        errEl.textContent = '❌ Username atau password salah.';
+        btn.disabled = false;
+        btn.textContent = originalText;
+        return;
+      }
+
+      currentUser = data;
+      btn.disabled = false;
+      btn.textContent = originalText;
+      showApp();
+    } catch(err){
+      errEl.textContent = '💥 ' + err.message;
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+});
+
+/* ============================================
+   APP
+   ============================================ */
 function showApp(){
-  $('loginPage').style.display = 'none';
+  hideAll();
   $('app').style.display = 'block';
   $('uName').textContent = currentUser.name;
   $('uRole').textContent = currentUser.role;
   render();
 }
 
-/* ============ ROUTER ============ */
+$('logoutBtn').addEventListener('click', () => {
+  currentUser = null;
+  showPortal();
+});
+
 async function render(){
   if(!currentUser) return;
-  if(currentUser.role === 'customer') await renderCustomer();
-  else if(currentUser.role === 'driver') await renderDriver();
-  else await renderAdmin();
+  try{
+    if(currentUser.role === 'customer') await renderCustomer();
+    else if(currentUser.role === 'driver') await renderDriver();
+    else await renderAdmin();
+  } catch(err){
+    toast('Error: ' + err.message, 'err');
+  }
 }
 
-/* ============ CUSTOMER ============ */
+/* ============================================
+   CUSTOMER DASHBOARD
+   ============================================ */
 async function renderCustomer(){
-  const { data: settings } = await sb.from('settings').select('*').eq('id', 1).single();
+  const { data: settings } = await sb.from('settings').select('*').eq('id', 1).maybeSingle();
   const { data: services } = await sb.from('services').select('*').eq('active', true);
   const { data: orders }   = await sb.from('orders').select('*').eq('customer_id', currentUser.id).order('id', { ascending: false });
 
@@ -260,9 +665,7 @@ async function renderCustomer(){
         </div>
         <label class="field"><span>Jumlah Penumpang</span><input type="number" class="input" id="passengers" min="1" max="12" value="1" required></label>
         <label class="field"><span>Pembayaran</span>
-          <select class="input" id="payment">
-            <option>Tunai</option><option>Transfer Bank</option><option>E-Wallet</option>
-          </select>
+          <select class="input" id="payment"><option>Tunai</option><option>Transfer Bank</option><option>E-Wallet</option></select>
         </label>
         <div style="margin:14px 0 8px;font-size:13.5px;font-weight:600;color:#334155">Layanan Tambahan</div>
         <div class="services" id="serviceList">
@@ -277,7 +680,7 @@ async function renderCustomer(){
           <span>Total Pembayaran</span>
           <strong id="totalPrice">${rupiah(s.base_fare + s.per_passenger)}</strong>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">🚐 Pesan Sekarang</button>
+        <button type="submit" class="btn-primary btn-block" style="width:100%;padding:14px">🚐 Pesan Sekarang</button>
       </form>
     </div>
 
@@ -293,9 +696,7 @@ async function renderCustomer(){
             📅 ${esc(o.date)} ${esc(o.time)} · 👥 ${o.passengers} penumpang<br>
             🧑‍✈️ Driver: <b>${o.driver_name ? esc(o.driver_name) : 'Belum ada'}</b>
           </div>
-          <div class="order-foot">
-            <div class="price">${rupiah(o.total_price)}</div>
-          </div>
+          <div class="order-foot"><div class="price">${rupiah(o.total_price)}</div></div>
         </div>`).join('') : '<div class="empty">Belum ada pesanan.</div>'}
     </div>
   `;
@@ -312,7 +713,7 @@ async function renderCustomer(){
   $('bookingForm').addEventListener('submit', async e => {
     e.preventDefault();
     const from = $('from').value.trim();
-    const to   = $('to').value.trim();
+    const to = $('to').value.trim();
     if(!from || !to) return;
 
     const passengers = parseInt($('passengers').value) || 1;
@@ -337,16 +738,15 @@ async function renderCustomer(){
     };
 
     const { error } = await sb.from('orders').insert(order);
-    if(error){
-      toast('❌ ' + error.message, 'err');
-      return;
-    }
+    if(error){ toast('❌ ' + error.message, 'err'); return; }
     toast('✅ Pesanan berhasil!', 'ok');
     renderCustomer();
   });
 }
 
-/* ============ DRIVER ============ */
+/* ============================================
+   DRIVER DASHBOARD
+   ============================================ */
 async function renderDriver(){
   const { data: pending } = await sb.from('orders').select('*').eq('status', 'pending').order('id', { ascending: false });
   const { data: mine }    = await sb.from('orders').select('*').eq('driver_id', currentUser.id).order('id', { ascending: false });
@@ -369,6 +769,7 @@ async function renderDriver(){
     const btn = e.target.closest('button[data-action]');
     if(!btn) return;
     const id = parseInt(btn.dataset.id);
+    btn.disabled = true;
 
     if(btn.dataset.action === 'take'){
       const { error } = await sb.from('orders').update({
@@ -377,18 +778,20 @@ async function renderDriver(){
         driver_name: currentUser.name
       }).eq('id', id);
       if(!error){ toast('✅ Order diambil', 'ok'); renderDriver(); }
+      else { toast('❌ ' + error.message, 'err'); btn.disabled = false; }
     }
     if(btn.dataset.action === 'finish'){
       const { error } = await sb.from('orders').update({ status: 'completed' }).eq('id', id);
       if(!error){ toast('🎉 Order selesai', 'ok'); renderDriver(); }
+      else { toast('❌ ' + error.message, 'err'); btn.disabled = false; }
     }
   });
 }
 
 function orderCardDriver(o, mode){
   const btn = mode === 'take'
-    ? (o.status === 'pending' ? `<button class="btn btn-primary" data-action="take" data-id="${o.id}">Ambil Order</button>` : '')
-    : (o.status === 'accepted' ? `<button class="btn btn-primary" data-action="finish" data-id="${o.id}">Selesaikan</button>` : '');
+    ? (o.status === 'pending' ? `<button class="btn-primary btn-sm" data-action="take" data-id="${o.id}">Ambil Order</button>` : '')
+    : (o.status === 'accepted' ? `<button class="btn-primary btn-green btn-sm" data-action="finish" data-id="${o.id}">Selesaikan</button>` : '');
 
   return `
     <div class="order">
@@ -407,7 +810,9 @@ function orderCardDriver(o, mode){
     </div>`;
 }
 
-/* ============ ADMIN ============ */
+/* ============================================
+   ADMIN DASHBOARD
+   ============================================ */
 async function renderAdmin(){
   const { data: users }    = await sb.from('users').select('*').order('id');
   const { data: orders }   = await sb.from('orders').select('*').order('id', { ascending: false });
@@ -422,11 +827,11 @@ async function renderAdmin(){
   $('main').innerHTML = `
     <div class="card">
       <h3>Dashboard</h3>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
-        <div><small style="color:#64748b">Total Pesanan</small><div style="font-size:22px;font-weight:700">${ords.length}</div></div>
-        <div><small style="color:#64748b">Menunggu</small><div style="font-size:22px;font-weight:700">${ords.filter(o=>o.status==='pending').length}</div></div>
-        <div><small style="color:#64748b">Selesai</small><div style="font-size:22px;font-weight:700">${completed.length}</div></div>
-        <div><small style="color:#64748b">Pendapatan</small><div style="font-size:18px;font-weight:700">${rupiah(revenue)}</div></div>
+      <div class="stats">
+        <div class="stat"><small>Total Pesanan</small><div>${ords.length}</div></div>
+        <div class="stat"><small>Menunggu</small><div>${ords.filter(o=>o.status==='pending').length}</div></div>
+        <div class="stat"><small>Selesai</small><div>${completed.length}</div></div>
+        <div class="stat"><small>Pendapatan</small><div style="font-size:16px">${rupiah(revenue)}</div></div>
       </div>
     </div>
 
@@ -435,23 +840,23 @@ async function renderAdmin(){
       <form id="addSvcForm" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
         <label class="field" style="flex:2;min-width:150px;margin:0"><span>Nama</span><input class="input" id="svcName" required></label>
         <label class="field" style="flex:1;min-width:100px;margin:0"><span>Harga</span><input class="input" type="number" id="svcPrice" value="5000" required></label>
-        <button class="btn btn-primary" type="submit">+ Tambah</button>
+        <button class="btn-primary" type="submit">+ Tambah</button>
       </form>
     </div>
 
     <div class="card">
       <h3>Layanan (${svcs.length})</h3>
-      ${svcs.map(sv => `
-        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9">
+      ${svcs.length ? svcs.map(sv => `
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;align-items:center;gap:10px">
           <div><b>${esc(sv.name)}</b> · <span style="color:#64748b;font-size:13px">${sv.price>0?rupiah(sv.price):'Gratis'}</span></div>
-          <button class="btn btn-ghost" style="color:#dc2626" data-del-svc="${sv.id}">Hapus</button>
-        </div>`).join('')}
+          <button class="btn-ghost btn-sm" style="color:#dc2626" data-del-svc="${sv.id}">Hapus</button>
+        </div>`).join('') : '<div class="empty">Belum ada layanan.</div>'}
     </div>
 
     <div class="card">
       <h3>Pengguna (${usrs.length})</h3>
       ${usrs.map(u => `
-        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9">
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;align-items:center;gap:10px">
           <div><b>${esc(u.name)}</b> <small style="color:#64748b">@${esc(u.username)}</small></div>
           <span class="badge badge-blue">${esc(u.role)}</span>
         </div>`).join('')}
@@ -491,15 +896,27 @@ async function renderAdmin(){
   });
 }
 
-/* ============ INIT ============ */
-$('demoInfo').innerHTML = DEMO.customer;
+/* ============================================
+   INIT
+   ============================================ */
+(function init(){
+  const savedUrl = localStorage.getItem('transgo_url');
+  const savedKey = localStorage.getItem('transgo_key');
 
-// Cek URL/KEY masih placeholder
-if(SUPABASE_URL.includes('xxxxx')){
-  setTimeout(() => {
-    $('loginError').textContent = '⚠️ Isi SUPABASE_URL dan SUPABASE_KEY dulu!';
-  }, 500);
-}
+  if(savedUrl && savedKey){
+    SUPABASE_URL = savedUrl;
+    SUPABASE_KEY = savedKey;
+    try{
+      sb = supabase.createClient(savedUrl, savedKey);
+      showPortal();  // langsung ke portal pilih peran
+    } catch(err){
+      showSetup();
+      showStatus('setupStatus', '❌ Konfigurasi rusak. Isi ulang.', 'err');
+    }
+  } else {
+    showSetup();
+  }
+})();
 </script>
 </body>
 </html>
