@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransGo</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f1f5f9;
+    }
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb, #0ea5e9);
+    }
+    .login-card {
+      background: #fff;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 20px;
+      padding: 34px 26px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.25);
+    }
+    .logo { font-size: 44px; text-align: center; line-height: 1; }
+    h1 { text-align: center; font-size: 24px; margin: 8px 0 4px; }
+    .sub { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 22px; }
+    .role-tabs {
+      display: flex;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 5px;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .role-tab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px 6px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+    }
+    .role-tab.active { background: #fff; color: #2563eb; }
+    .field { display: block; margin-bottom: 14px; }
+    .field span {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+    .input {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    .input:focus { border-color: #2563eb; }
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      width: 100%;
+      margin-top: 6px;
+    }
+    .btn-primary { background: #2563eb; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="logo">🚐</div>
+      <h1>TransGo</h1>
+      <p class="sub">Sistem Transportasi Penumpang</p>
+
+      <div class="role-tabs">
+        <button class="role-tab active">Customer</button>
+        <button class="role-tab">Driver</button>
+        <button class="role-tab">Admin</button>
+      </div>
+
+      <label class="field">
+        <span>Username</span>
+        <input type="text" class="input" placeholder="Masukkan username">
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input type="password" class="input" placeholder="Masukkan password">
+      </label>
+
+      <button class="btn btn-primary">Masuk</button>
+    </div>
+  </div>
+</body>
+</html>
